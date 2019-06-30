@@ -29,7 +29,13 @@ class FriendServiceProvider extends ServiceProvider
 			$migrations[__DIR__ . '/database/migrations/' . $migration] = $this->getPath($migration, database_path('migrations'));
 
 		$publishes = [
-			'migrations' => $migrations
+			'migrations' => $migrations,
+			'factories' => [
+				__DIR__ . '/database/factories/' => database_path('factories')
+			],
+			'seeds' => [
+				__DIR__ . '/database/seeds/' => database_path('seeds')
+			]
 		];
 
 		foreach ($publishes as $key => $value)

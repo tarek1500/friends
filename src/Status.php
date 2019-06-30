@@ -31,4 +31,14 @@ class Status
 				return null;
 		}
 	}
+
+	/**
+	 * Get random status value.
+	 *
+	 * @return int
+	 */
+	public static function getRandomStatus()
+	{
+		return Arr::random([Status::Pending, Status::Accept, Status::Block]);
+	}
 }
