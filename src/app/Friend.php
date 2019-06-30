@@ -24,6 +24,18 @@ class Friend extends Model
 	];
 
 	/**
+	 * Convert the status to its equivalent name.
+	 *
+	 * @param  int  $value
+	 *
+	 * @return string|null
+	 */
+	public function getStatusAttribute($value)
+	{
+		return Status::getName($value);
+	}
+
+	/**
 	 * Get the sender that the friendship belongs to.
 	 *
 	 * @return \Illuminate\Database\Eloquent\Relations\MorphTo
