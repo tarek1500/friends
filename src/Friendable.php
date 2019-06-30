@@ -2,7 +2,9 @@
 
 namespace TarekIM\Friends;
 
+use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 use TarekIM\Friends\Events\AcceptFriend;
 use TarekIM\Friends\Events\BlockFriend;
 use TarekIM\Friends\Events\CancelRequest;
@@ -267,5 +269,30 @@ trait Friendable
 		return Friend::where(function ($query) {
 			$query->whereSender($this);
 		})->whereStatus(Status::Block);
+	}
+
+	/**
+	 * Dynamically retrieve attributes on the model.
+	 * NOTE: Make sure the model doesn't has any attribute name like 'friendships', 'getPending', 'pending', 'getFriends', 'friends', 'getBlocked' or 'blocked'.
+	 *
+	 * @param  string  $key
+	 * @return mixed
+	 */
+	public function __get($key)
+	{
+		if (Friend::$enableDynamicAttributes)
+		{
+			if (method_exists($this, $key))
+			{
+				$query = $this->$key();
+
+				if ($query instanceof EloquentBuilder)
+					return $query->get();
+			}
+			else if (in_array($key, ['pending', 'friends', 'blocked']))
+				return $this->{'get' . Str::studly($key)}()->get();
+		}
+
+		return parent::__get($key);
 	}
 }
