@@ -3,6 +3,13 @@
 namespace TarekIM\Friends;
 
 use Illuminate\Database\Eloquent\Model;
+use TarekIM\Friends\Events\AcceptFriend;
+use TarekIM\Friends\Events\BlockFriend;
+use TarekIM\Friends\Events\CancelRequest;
+use TarekIM\Friends\Events\DenyFriend;
+use TarekIM\Friends\Events\FriendRequest;
+use TarekIM\Friends\Events\UnblockFriend;
+use TarekIM\Friends\Events\Unfriend;
 
 trait Friendable
 {
@@ -82,7 +89,11 @@ trait Friendable
 			'status' => Status::Pending
 		];
 
-		return Friend::create($data);
+		$friendship = Friend::create($data);
+
+		event(new FriendRequest($this, $model));
+
+		return $friendship;
 	}
 
 	/**
@@ -112,7 +123,11 @@ trait Friendable
 			'status' => Status::Block
 		];
 
-		return Friend::create($data);
+		$friendship = Friend::create($data);
+
+		event(new BlockFriend($this, $model));
+
+		return $friendship;
 	}
 
 	/**
@@ -129,7 +144,11 @@ trait Friendable
 		if (is_null($friendship) || $friendship->status != Status::Block)
 			return false;
 
-		return $friendship->delete() ?? false;
+		$value = $friendship->delete() ?? false;
+
+		event(new UnblockFriend($this, $model));
+
+		return $value;
 	}
 
 	/**
@@ -146,7 +165,11 @@ trait Friendable
 		if (is_null($friendship) || $friendship->status != Status::Pending)
 			return false;
 
-		return $friendship->delete() ?? false;
+		$value = $friendship->delete() ?? false;
+
+		event(new CancelRequest($this, $model));
+
+		return $value;
 	}
 
 	/**
@@ -165,6 +188,8 @@ trait Friendable
 
 		$friendship->update(['status' => Status::Accept]);
 
+		event(new AcceptFriend($this, $model));
+
 		return $friendship;
 	}
 
@@ -182,7 +207,11 @@ trait Friendable
 		if (is_null($friendship) || $friendship->status != Status::Pending)
 			return false;
 
-		return $friendship->delete() ?? false;
+		$value = $friendship->delete() ?? false;
+
+		event(new DenyFriend($this, $model));
+
+		return $value;
 	}
 
 	/**
@@ -199,7 +228,11 @@ trait Friendable
 		if (is_null($friendship) || $friendship->status != Status::Accept)
 			return false;
 
-		return $friendship->delete() ?? false;
+		$value = $friendship->delete() ?? false;
+
+		event(new Unfriend($this, $model));
+
+		return $value;
 	}
 
 	/**
