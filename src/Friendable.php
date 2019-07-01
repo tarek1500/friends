@@ -78,6 +78,9 @@ trait Friendable
 	 */
 	public function sendFriendRequest(Model $model)
 	{
+		if ($this->is($model))
+			return null;
+
 		$friendship = $this->friendship($model)->first();
 
 		if (!is_null($friendship))
@@ -107,11 +110,14 @@ trait Friendable
 	 */
 	public function blockFriend(Model $model)
 	{
+		if ($this->is($model))
+			return null;
+
 		$friendship = $this->friendship($model)->first();
 
 		if (!is_null($friendship))
 		{
-			if ($friendship->status == Status::Block)
+			if ($friendship->getOriginal('status') == Status::Block)
 				return null;
 
 			$friendship->delete();
@@ -141,9 +147,12 @@ trait Friendable
 	 */
 	public function unblockFriend(Model $model)
 	{
+		if ($this->is($model))
+			return false;
+
 		$friendship = $this->friendship($model, true)->first();
 
-		if (is_null($friendship) || $friendship->status != Status::Block)
+		if (is_null($friendship) || $friendship->getOriginal('status') != Status::Block)
 			return false;
 
 		$value = $friendship->delete() ?? false;
@@ -162,9 +171,12 @@ trait Friendable
 	 */
 	public function cancelFriendRequest(Model $model)
 	{
+		if ($this->is($model))
+			return false;
+
 		$friendship = $this->friendship($model, true)->first();
 
-		if (is_null($friendship) || $friendship->status != Status::Pending)
+		if (is_null($friendship) || $friendship->getOriginal('status') != Status::Pending)
 			return false;
 
 		$value = $friendship->delete() ?? false;
@@ -183,9 +195,12 @@ trait Friendable
 	 */
 	public function acceptFriendRequest(Model $model)
 	{
+		if ($this->is($model))
+			return null;
+
 		$friendship = $this->friendship($model, $this, true)->first();
 
-		if (is_null($friendship) || $friendship->status != Status::Pending)
+		if (is_null($friendship) || $friendship->getOriginal('status') != Status::Pending)
 			return null;
 
 		$friendship->update(['status' => Status::Accept]);
@@ -204,9 +219,12 @@ trait Friendable
 	 */
 	public function denyFriendRequest(Model $model)
 	{
+		if ($this->is($model))
+			return false;
+
 		$friendship = $this->friendship($model, $this, true)->first();
 
-		if (is_null($friendship) || $friendship->status != Status::Pending)
+		if (is_null($friendship) || $friendship->getOriginal('status') != Status::Pending)
 			return false;
 
 		$value = $friendship->delete() ?? false;
@@ -225,9 +243,12 @@ trait Friendable
 	 */
 	public function unfriend(Model $model)
 	{
+		if ($this->is($model))
+			return false;
+
 		$friendship = $this->friendship($model)->first();
 
-		if (is_null($friendship) || $friendship->status != Status::Accept)
+		if (is_null($friendship) || $friendship->getOriginal('status') != Status::Accept)
 			return false;
 
 		$value = $friendship->delete() ?? false;

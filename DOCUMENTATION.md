@@ -163,3 +163,15 @@ $receiver = Friend::find(1)->receiver;
 | `orWhereSender` | Add orWhere statement on the sender. |
 | `whereReceiver` | Add where statement on the receiver. |
 | `orWhereReceiver` | Add orWhere statement on the receiver. |
+
+## List of events
+| Event | Description |
+| --- | --- |
+| `FriendRequest` | Fires when a friend request sent to another model. |
+| `AcceptFriend` | Fires when a model accepts another model's friend request. |
+| `DenyFriend` | Fires when a model denies another model's friend request. |
+| `BlockFriend` | Fires when a model blocks another model. |
+| `UnblockFriend` | Fires when a model unblocks another model. |
+| `CancelRequest` | Fires when a model cancels his friend request to another model. |
+| `Unfriend` | Fires when a model removes a friend. |
+>All of the previous events extend the parent event `FriendEvent`.
